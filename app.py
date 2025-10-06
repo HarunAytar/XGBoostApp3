@@ -39,7 +39,6 @@ with st.form("prediction_form"):
 
 # 🎯 3️⃣ Tahmin işlemi
 if submitted:
-    # Kullanıcıdan alınan verileri bir sözlükte topla
     data = {
         "aniloks_no": aniloks_no,
         "klise_no": klise_no,
@@ -63,34 +62,40 @@ if submitted:
         "hazırlanan_boya_b": hazırlanan_boya_b
     }
 
-    # DataFrame oluştur
     df_new = pd.DataFrame([data])
 
-    # Kategorik değişkenleri encode et
     encoded_cat = encoder.transform(df_new[["aniloks_no", "klise_no"]])
     encoded_cat_df = pd.DataFrame(encoded_cat, columns=encoder.get_feature_names_out(["aniloks_no", "klise_no"]))
-
-    # Sayısal sütunları koru
     numeric_new_df = df_new.drop(columns=["aniloks_no", "klise_no"])
-
-    # Tüm sütunları birleştir
     df_new_encoded = pd.concat([encoded_cat_df, numeric_new_df], axis=1)
 
-    # Modelin beklediği sıraya göre sırala
     model_features = model.estimators_[0].get_booster().feature_names
     df_new_encoded = df_new_encoded[model_features]
 
-    # Tahmin yap
     prediction = model.predict(df_new_encoded)
 
-    # Sonuçları göster
+    # 🎯 4️⃣ Tahmin sonuçlarını göster
     st.success("✅ Tahmin tamamlandı!")
     st.subheader("📊 Tahmin Sonuçları")
     st.write(f"**Bıçak-Aniloks Mesafe:** {prediction[0][0]:.2f}")
     st.write(f"**Aniloks-Klişe Mesafe:** {prediction[0][1]:.2f}")
     st.write(f"**Klişe-Tambur Mesafe:** {prediction[0][2]:.2f}")
 
-# 6️⃣ Yönetici için indirilebilir dosya butonu
+    # 🎯 5️⃣ Tahmin sonuçlarını Excel'e kaydet
+    result_row = df_new.copy()
+    result_row["bicak_aniloks_mesafe"] = prediction[0][0]
+    result_row["aniloks_klise_mesafe"] = prediction[0][1]
+    result_row["klise_tambur_mesafe"] = prediction[0][2]
+
+    if os.path.exists("results.xlsx"):
+        old_df = pd.read_excel("results.xlsx")
+        updated_df = pd.concat([old_df, result_row], ignore_index=True)
+    else:
+        updated_df = result_row
+
+    updated_df.to_excel("results.xlsx", index=False)
+
+# 🎯 6️⃣ Yönetici için indirilebilir dosya butonu 
 if os.path.exists("results.xlsx"):
     with open("results.xlsx", "rb") as f:
         st.download_button(
@@ -99,5 +104,7 @@ if os.path.exists("results.xlsx"):
             file_name="tahmin_sonuclari.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+
 
 
