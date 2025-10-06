@@ -88,3 +88,13 @@ if submitted:
     st.write(f"**Bıçak-Aniloks Mesafe:** {prediction[0][0]:.2f}")
     st.write(f"**Aniloks-Klişe Mesafe:** {prediction[0][1]:.2f}")
     st.write(f"**Klişe-Tambur Mesafe:** {prediction[0][2]:.2f}")
+
+# 6️⃣ Yönetici için indirilebilir dosya butonu
+if os.path.exists("results.xlsx"):
+    with open("results.xlsx", "rb") as f:
+        st.download_button(
+            label="📥 Kaydedilen Sonuçları İndir (Excel)",
+            data=f,
+            file_name="tahmin_sonuclari.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
