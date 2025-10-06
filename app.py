@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import os
 
 # 🎯 1️⃣ Model ve encoder yükle
 model = joblib.load("xgboost_model.pkl")
@@ -98,3 +99,4 @@ if os.path.exists("results.xlsx"):
             file_name="tahmin_sonuclari.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
