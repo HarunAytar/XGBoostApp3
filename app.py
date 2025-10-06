@@ -77,7 +77,7 @@ if submitted:
     df_new_encoded = pd.concat([encoded_cat_df, numeric_new_df], axis=1)
 
     # Modelin beklediği sıraya göre sırala
-    model_features = model.get_booster().feature_names
+    model_features = model.estimators_[0].get_booster().feature_names
     df_new_encoded = df_new_encoded[model_features]
 
     # Tahmin yap
@@ -99,4 +99,5 @@ if os.path.exists("results.xlsx"):
             file_name="tahmin_sonuclari.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
 
